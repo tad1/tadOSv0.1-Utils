@@ -31,19 +31,21 @@ pub fn main(){
 
         const HEIGHT: usize = 30;
         const WIDTH: usize = 100;
-        let mut buffer: [u8; WIDTH] = [b' '; WIDTH];
+        let mut buffer: [u8; WIDTH * HEIGHT] = [b' '; WIDTH * HEIGHT];
 
         let _ = volume_controller.file_seek_from_start(file, 0);
         
-        for i in 0..65430{
-            if i % HEIGHT == 0{
-                kernel_call_a(common::KernelFunction::Spin, 50);
-                print!("\x1b[H");
-            }
+        for i in 0..65430/HEIGHT{
+            kernel_call_a(common::KernelFunction::Spin, 50);
+            print!("\x1b[H");
             
             let n_bytes = volume_controller.read(file, &mut buffer).unwrap();
-            let str: &str = unsafe {transmute(&buffer[..n_bytes] as &[u8])};
-            println!("{}",str);
+            let mut strs: [&str; HEIGHT] = [""; HEIGHT];
+            for ii in 0..HEIGHT{
+                strs[ii] = unsafe {transmute(&buffer[ii*WIDTH..(ii+1)*WIDTH] as &[u8])};
+                println!("{}", strs[ii]);
+            }
+
         }
         
         let _ = volume_controller.close_file(file);
