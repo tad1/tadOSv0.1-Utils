@@ -1,0 +1,3 @@
+[build]
+target = "aarch64-unknown-none-softfloat"
+rustflags = ["-C", "link-arg=--library-path=./src/common/", "-C", "link-arg=--script=linker.ld"]
